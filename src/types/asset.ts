@@ -1,0 +1,92 @@
+// Asset Management Types
+export type UserRole = 'owner' | 'tenant' | 'operator' | 'consultant';
+
+export type AssetType = 'office' | 'retail' | 'industrial' | 'residential' | 'mixed_use';
+
+export interface Organization {
+  id: string;
+  name: string;
+  registration_number?: string;
+  address?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Portfolio {
+  id: string;
+  organization_id: string;
+  name: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Asset {
+  id: string;
+  portfolio_id: string;
+  name: string;
+  asset_type: AssetType;
+  address: string;
+  total_area: number;
+  year_built?: number;
+  energy_rating?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AssetTenant {
+  id: string;
+  asset_id: string;
+  tenant_id: string;
+  floor_number?: number;
+  area_occupied: number;
+  lease_start_date: string;
+  lease_end_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AssetDocument {
+  id: string;
+  asset_id: string;
+  document_id: string;
+  document_type: string;
+  upload_date: string;
+  document: {
+    id: string;
+    filename: string;
+    file_type: string;
+    file_size: number;
+    storage_path: string;
+  };
+}
+
+// API Request/Response Types
+export interface CreateAssetRequest {
+  portfolio_id: string;
+  name: string;
+  asset_type: AssetType;
+  address: string;
+  total_area: number;
+  year_built?: number;
+  energy_rating?: string;
+}
+
+export interface UpdateAssetRequest extends Partial<CreateAssetRequest> {
+  id: string;
+}
+
+export interface AssignTenantRequest {
+  asset_id: string;
+  tenant_id: string; // This will be the email address
+  floor_number?: number;
+  area_occupied: number;
+  lease_start_date: string;
+  lease_end_date?: string;
+}
+
+export interface UploadDocumentRequest {
+  asset_id: string;
+  document_type: string;
+  file: File;
+}
