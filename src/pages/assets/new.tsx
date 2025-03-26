@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useRouter } from 'next/router';
+import { AssetCreate, AssetType } from '@/types/asset';
+import { assetApi } from '@/services/api';
+import AssetForm from '@/components/assets/AssetForm';
 
 // Add this debug function at the top of your file
 function debugLog(message: string, data?: any) {
@@ -34,7 +37,7 @@ const NewAssetPage = () => {
   
   // State for API data
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
-  const [assetTypes, setAssetTypes] = useState<string[]>([]);
+  const [assetTypes, setAssetTypes] = useState<AssetType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -96,19 +99,8 @@ const NewAssetPage = () => {
       }
       
       // Get asset types
-      const assetTypeResponse = await fetch('/api/assets/types', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!assetTypeResponse.ok) {
-        throw new Error('Failed to fetch asset types');
-      }
-      
-      const types = await assetTypeResponse.json();
-      setAssetTypes(types || []);
+      const types = await assetApi.getAssetTypes();
+      setAssetTypes(types);
       
     } catch (error) {
       const err = error as Error;
@@ -168,6 +160,15 @@ const NewAssetPage = () => {
     }
   };
   
+  const handleCreateAsset = async (data: AssetCreate) => {
+    try {
+      await assetApi.createAsset(data);
+      router.push(`/portfolios/${data.portfolio_id}`);
+    } catch (err) {
+      setError('Failed to create asset');
+    }
+  };
+  
   if (loading && portfolios.length === 0) {
     return (
       <div className="p-4">
@@ -175,6 +176,20 @@ const NewAssetPage = () => {
         <div className="flex justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="p-4">
+        <div className="text-red-500">{error}</div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -190,124 +205,11 @@ const NewAssetPage = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Portfolio *
-            </label>
-            <select
-              name="portfolio_id"
-              value={formData.portfolio_id}
-              onChange={handleInputChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-            >
-              <option value="">Select a portfolio</option>
-              {portfolios.map((portfolio: any) => (
-                <option key={portfolio.id} value={portfolio.id}>
-                  {portfolio.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Asset Name</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Asset Type</label>
-            <select
-              name="asset_type"
-              value={formData.asset_type}
-              onChange={handleInputChange}
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-              required
-            >
-              <option value="">Select an asset type</option>
-              {assetTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Address</label>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Total Area (m²)</label>
-            <input
-              type="number"
-              name="total_area"
-              value={formData.total_area}
-              onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              required
-              min="0"
-              step="0.01"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Year Built</label>
-            <input
-              type="number"
-              name="year_built"
-              value={formData.year_built || ''}
-              onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              min="1800"
-              max={new Date().getFullYear()}
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Energy Rating</label>
-            <input
-              type="text"
-              name="energy_rating"
-              value={formData.energy_rating}
-              onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-          
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
-            >
-              {loading ? 'Creating...' : 'Create Asset'}
-            </button>
-          </div>
-        </form>
+        <AssetForm
+          onSubmit={handleCreateAsset}
+          portfolioId={formData.portfolio_id}
+          assetTypes={assetTypes}
+        />
       </div>
     </div>
   );

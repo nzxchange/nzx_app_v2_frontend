@@ -21,17 +21,22 @@ export interface Portfolio {
   updated_at: string;
 }
 
+export interface AssetType {
+  id: string;
+  name: string;
+}
+
 export interface Asset {
   id: string;
-  portfolio_id: string;
   name: string;
-  asset_type: AssetType;
+  description?: string;
   address: string;
-  total_area: number;
-  year_built?: number;
-  energy_rating?: string;
-  created_at: string;
-  updated_at: string;
+  asset_type: string;
+  portfolio_id: string;
+  floor_area?: number;
+  occupancy_rate?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface AssetTenant {
@@ -89,4 +94,14 @@ export interface UploadDocumentRequest {
   asset_id: string;
   document_type: string;
   file: File;
+}
+
+export interface AssetCreate {
+  name: string;
+  description?: string;
+  address: string;
+  asset_type: string;
+  portfolio_id: string;
+  floor_area?: number;
+  occupancy_rate?: number;
 }
