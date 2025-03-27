@@ -11,7 +11,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Create a Supabase client
-export const supabase = createClient<SupabaseDatabase>(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient<SupabaseDatabase>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    }
+  }
+);
 
 // Add a debug function to check authentication
 export const checkAuth = async () => {
