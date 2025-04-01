@@ -105,3 +105,6 @@ export interface AssetCreate {
   floor_area?: number;
   occupancy_rate?: number;
 }
+
+// If you need the enum version, you can keep it separately
+export type AssetTypeEnum = 'office' | 'retail' | 'industrial' | 'residential' | 'mixed_use';

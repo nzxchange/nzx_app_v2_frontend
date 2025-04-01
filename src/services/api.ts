@@ -22,29 +22,17 @@ export const assetApi = {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error response:', errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error('Failed to fetch asset types');
       }
       
       const data = await response.json();
       console.log('Raw response data:', data); // Debug log
       
-      // Ensure we have an array and validate its structure
-      if (!Array.isArray(data)) {
-        console.error('Expected array but got:', typeof data);
-        return [];
-      }
-
-      // Validate and transform each item
-      const validatedTypes = data.map(item => {
-        if (typeof item !== 'object' || !item.id || !item.name) {
-          console.error('Invalid asset type item:', item);
-          return null;
-        }
-        return {
-          id: String(item.id),
-          name: String(item.name)
-        };
-      }).filter((item): item is AssetType => item !== null);
+      // Validate and transform the response
+      const validatedTypes = data.map(item => ({
+        id: String(item.id),
+        name: String(item.name)
+      }));
 
       return validatedTypes;
     } catch (error) {
