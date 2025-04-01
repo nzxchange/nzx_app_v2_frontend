@@ -26,8 +26,27 @@ export const assetApi = {
       }
       
       const data = await response.json();
-      console.log('Asset types response:', data);
-      return Array.isArray(data) ? data : [];
+      console.log('Raw response data:', data); // Debug log
+      
+      // Ensure we have an array and validate its structure
+      if (!Array.isArray(data)) {
+        console.error('Expected array but got:', typeof data);
+        return [];
+      }
+
+      // Validate and transform each item
+      const validatedTypes = data.map(item => {
+        if (typeof item !== 'object' || !item.id || !item.name) {
+          console.error('Invalid asset type item:', item);
+          return null;
+        }
+        return {
+          id: String(item.id),
+          name: String(item.name)
+        };
+      }).filter((item): item is AssetType => item !== null);
+
+      return validatedTypes;
     } catch (error) {
       console.error('Error fetching asset types:', error);
       // Return default asset types as fallback
