@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { AssetFormData, AssetType } from '@/types/asset';
+import { AssetFormData, AssetType, AssetTypeEnum } from '@/types/asset';
 
 interface AssetFormProps {
   onSubmit: (data: AssetFormData) => void;

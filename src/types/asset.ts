@@ -1,7 +1,14 @@
 // Asset Management Types
 export type UserRole = 'owner' | 'tenant' | 'operator' | 'consultant';
 
-export type AssetType = 'office' | 'retail' | 'industrial' | 'residential' | 'mixed_use';
+// Define enum for asset type values
+export type AssetTypeEnum = 'office' | 'retail' | 'industrial' | 'residential' | 'mixed_use';
+
+// Define interface for asset type objects with id and name
+export interface AssetType {
+  id: string;
+  name: string;
+}
 
 export interface Organization {
   id: string;
@@ -19,11 +26,6 @@ export interface Portfolio {
   description?: string;
   created_at: string;
   updated_at: string;
-}
-
-export interface AssetType {
-  id: string;
-  name: string;
 }
 
 export interface Asset {
@@ -105,9 +107,6 @@ export interface AssetCreate {
   floor_area?: number;
   occupancy_rate?: number;
 }
-
-// If you need the enum version, you can keep it separately
-export type AssetTypeEnum = 'office' | 'retail' | 'industrial' | 'residential' | 'mixed_use';
 
 // Add a type for the asset creation form
 export interface AssetFormData {
