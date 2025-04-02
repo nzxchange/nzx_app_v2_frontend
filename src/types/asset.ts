@@ -108,3 +108,14 @@ export interface AssetCreate {
 
 // If you need the enum version, you can keep it separately
 export type AssetTypeEnum = 'office' | 'retail' | 'industrial' | 'residential' | 'mixed_use';
+
+// Add a type for the asset creation form
+export interface AssetFormData {
+  name: string;
+  description?: string;
+  address: string;
+  asset_type: AssetTypeEnum;
+  portfolio_id: string;
+  floor_area?: number;
+  occupancy_rate?: number;
+}

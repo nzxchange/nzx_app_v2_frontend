@@ -1,4 +1,4 @@
-import { Asset, AssetCreate, AssetType } from '@/types/asset';
+import { Asset, AssetCreate, AssetType, AssetTypeEnum } from '@/types/asset';
 import { supabase } from '@/lib/supabase';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
@@ -28,23 +28,20 @@ export const assetApi = {
       const data = await response.json();
       console.log('Raw response data:', data); // Debug log
       
-      // Validate and transform the response
-      const validatedTypes = data.map(item => ({
+      // Transform the response to match our AssetType interface
+      return data.map((item: any) => ({
         id: String(item.id),
         name: String(item.name)
       }));
-
-      return validatedTypes;
     } catch (error) {
       console.error('Error fetching asset types:', error);
       // Return default asset types as fallback
       return [
-        { id: "commercial", name: "Commercial" },
-        { id: "residential", name: "Residential" },
-        { id: "industrial", name: "Industrial" },
-        { id: "retail", name: "Retail" },
-        { id: "office", name: "Office" },
-        { id: "mixed_use", name: "Mixed Use" }
+        { id: 'office', name: 'Office' },
+        { id: 'retail', name: 'Retail' },
+        { id: 'industrial', name: 'Industrial' },
+        { id: 'residential', name: 'Residential' },
+        { id: 'mixed_use', name: 'Mixed Use' }
       ];
     }
   },

@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { AssetCreate, AssetType } from '@/types/asset';
+import { AssetFormData, AssetType } from '@/types/asset';
 
 interface AssetFormProps {
-  onSubmit: (data: AssetCreate) => void;
+  onSubmit: (data: AssetFormData) => void;
   portfolioId: string;
   assetTypes: AssetType[];
 }
 
 export default function AssetForm({ onSubmit, portfolioId, assetTypes }: AssetFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<AssetCreate>();
+  const { register, handleSubmit, formState: { errors } } = useForm<AssetFormData>();
   
-  const handleFormSubmit = (data: AssetCreate) => {
+  const handleFormSubmit = (data: AssetFormData) => {
     onSubmit({
       ...data,
       portfolio_id: portfolioId
@@ -51,7 +51,7 @@ export default function AssetForm({ onSubmit, portfolioId, assetTypes }: AssetFo
       <div>
         <label className="block text-sm font-medium text-gray-700">Asset Type</label>
         <select
-          {...register('asset_type', { required: true })}
+          {...register('asset_type', { required: 'Asset type is required' })}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
         >
           <option value="">Select a type</option>
@@ -61,6 +61,7 @@ export default function AssetForm({ onSubmit, portfolioId, assetTypes }: AssetFo
             </option>
           ))}
         </select>
+        {errors.asset_type && <p className="text-red-500 text-sm">{errors.asset_type.message}</p>}
       </div>
 
       <div>
