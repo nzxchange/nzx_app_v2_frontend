@@ -1,27 +1,22 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabase';
 
 export default function AuthCallback() {
   const router = useRouter();
 
   useEffect(() => {
-    const handleCallback = async () => {
+    const handleAuthCallback = async () => {
       try {
-        // Get the hash fragment
-        const hashFragment = window.location.hash;
-        if (!hashFragment) {
-          throw new Error('No hash fragment found');
-        }
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
 
-        const params = new URLSearchParams(hashFragment.substring(1));
-        const type = params.get('type');
-
-        if (type === 'recovery') {
-          // For password reset, redirect to reset-password-confirm
-          router.push(`/auth/reset-password-confirm${hashFragment}`);
+        if (session) {
+          // If we have a session, redirect to dashboard
+          router.push('/dashboard');
         } else {
-          // For other auth callbacks, handle accordingly
+          // If no session, redirect to login
           router.push('/auth/login');
         }
       } catch (error) {
@@ -30,15 +25,12 @@ export default function AuthCallback() {
       }
     };
 
-    handleCallback();
+    handleAuthCallback();
   }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-4 text-gray-600">Processing your request...</p>
-      </div>
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
     </div>
   );
 } 
