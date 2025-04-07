@@ -309,13 +309,20 @@ export const Assets = () => {
         const { data: docsData, error: docsError } = await supabase
           .from('asset_documents')
           .select(`
-            *,
+            id,
+            asset_id,
+            document_id,
+            document_type,
+            upload_date,
             document:documents(
               id,
               filename,
               file_type,
               file_size,
-              storage_path
+              processed_data,
+              status,
+              uploaded_at,
+              user_id
             )
           `)
           .eq('asset_id', selectedAsset);
@@ -330,7 +337,7 @@ export const Assets = () => {
         
         if (tenantsError) throw tenantsError;
         
-        setDocuments(docsData || []);
+        setDocuments(docsData as AssetDocument[]);
         setTenants(tenantsData || []);
       } catch (err) {
         console.error('Error fetching asset details:', err);
@@ -600,8 +607,9 @@ export const Assets = () => {
               filename: file.name,
               file_type: file.type,
               file_size: file.size,
-              storage_path: filePath,
-              created_at: new Date().toISOString()
+              user_id: profile?.id,
+              uploaded_at: new Date().toISOString(),
+              status: 'uploaded'
             })
             .select()
             .single();
@@ -618,20 +626,27 @@ export const Assets = () => {
               upload_date: new Date().toISOString()
             })
             .select(`
-              *,
+              id,
+              asset_id,
+              document_id,
+              document_type,
+              upload_date,
               document:documents(
                 id,
                 filename,
                 file_type,
                 file_size,
-                storage_path
+                processed_data,
+                status,
+                uploaded_at,
+                user_id
               )
             `)
             .single();
           
           if (assetDocError) throw assetDocError;
           
-          setDocuments([...documents, assetDocData]);
+          setDocuments([...documents, assetDocData as AssetDocument]);
         }
       } catch (err) {
         console.error('Error uploading documents:', err);

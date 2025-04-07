@@ -59,18 +59,22 @@ export interface AssetTenant {
   updated_at: string;
 }
 
+// Update the AssetDocument interface to match the database schema
 export interface AssetDocument {
   id: string;
   asset_id: string;
   document_id: string;
   document_type: string;
-  upload_date: string;
+  upload_date: string | null;  // Make this nullable to match DB
   document: {
     id: string;
     filename: string;
     file_type: string;
     file_size: number;
-    storage_path: string;
+    processed_data?: any;  // Add if needed
+    status?: string;       // Add if needed
+    uploaded_at?: string;  // Add if needed
+    user_id: string;      // Add if needed
   };
 }
 
