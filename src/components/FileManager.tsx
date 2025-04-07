@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { File, Download, Trash2, Upload, Building2, Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { assetApi } from '../lib/api/assets';
-import type { Asset, AssetDocument } from '../types/asset';
+import type { Asset, AssetDocument, AssetType } from '../types/asset';
 
 export const FileManager = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -13,7 +13,10 @@ export const FileManager = () => {
   const [showNewAssetForm, setShowNewAssetForm] = useState(false);
   const [newAsset, setNewAsset] = useState({
     name: '',
-    asset_type: 'office' as const,
+    asset_type: {
+      id: '',
+      name: ''
+    } as AssetType,
     address: '',
     total_area: 0,
     portfolio_id: '', // This should be set based on user's context
@@ -30,11 +33,11 @@ export const FileManager = () => {
   ];
 
   const assetTypes = [
-    { value: 'office', label: 'Office' },
-    { value: 'retail', label: 'Retail' },
-    { value: 'industrial', label: 'Industrial' },
-    { value: 'residential', label: 'Residential' },
-    { value: 'mixed_use', label: 'Mixed Use' }
+    { id: 'office', name: 'Office' },
+    { id: 'retail', name: 'Retail' },
+    { id: 'industrial', name: 'Industrial' },
+    { id: 'residential', name: 'Residential' },
+    { id: 'mixed_use', name: 'Mixed Use' }
   ];
 
   useEffect(() => {
@@ -74,7 +77,10 @@ export const FileManager = () => {
       setShowNewAssetForm(false);
       setNewAsset({
         name: '',
-        asset_type: 'office',
+        asset_type: {
+          id: '',
+          name: ''
+        } as AssetType,
         address: '',
         total_area: 0,
         portfolio_id: '',
@@ -118,6 +124,16 @@ export const FileManager = () => {
       'image/*': ['.png', '.jpg', '.jpeg']
     }
   });
+
+  const handleAssetTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedTypeId = e.target.value;
+    const selectedType = assetTypes.find(type => type.id === selectedTypeId);
+    
+    setNewAsset({
+      ...newAsset,
+      asset_type: selectedType || { id: selectedTypeId, name: selectedTypeId } as AssetType
+    });
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -203,14 +219,13 @@ export const FileManager = () => {
                   Asset Type
                 </label>
                 <select
-                  value={newAsset.asset_type}
-                  onChange={(e) => setNewAsset({ ...newAsset, asset_type: e.target.value as any })}
+                  value={newAsset.asset_type.id}
+                  onChange={handleAssetTypeChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 >
-                  {assetTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
+                  <option value="">Select type</option>
+                  {assetTypes.map(type => (
+                    <option key={type.id} value={type.id}>{type.name}</option>
                   ))}
                 </select>
               </div>
