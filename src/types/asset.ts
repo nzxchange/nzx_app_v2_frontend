@@ -1,8 +1,13 @@
+import { Database } from './supabase';
+
 // Asset Management Types
 export type UserRole = 'owner' | 'tenant' | 'operator' | 'consultant';
 
 // Define enum for asset type values
 export type AssetTypeEnum = 'office' | 'retail' | 'industrial' | 'residential' | 'mixed_use';
+
+// Use the asset_type enum from your database types
+export type AssetType = Database['public']['Enums']['asset_type'];
 
 // Define interface for asset type objects with id and name
 export interface AssetType {
@@ -28,17 +33,18 @@ export interface Portfolio {
   updated_at: string;
 }
 
+// Update the Asset interface to use the imported AssetType
 export interface Asset {
   id: string;
-  name: string;
-  description?: string;
-  address: string;
-  asset_type: string;
   portfolio_id: string;
-  floor_area?: number;
-  occupancy_rate?: number;
-  created_at?: string;
-  updated_at?: string;
+  name: string;
+  asset_type: AssetType; // This will now include 'commercial'
+  address: string;
+  total_area: number;
+  year_built: number | null;
+  energy_rating: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export interface AssetTenant {

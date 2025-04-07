@@ -17,22 +17,12 @@ import { supabase } from '../lib/supabase';
 import { Database } from '@/types/supabase';
 import { User } from '@supabase/supabase-js';
 import { Profile, Organization } from '@/types/database.types';
+import { Asset, AssetType } from '@/types/asset';
 
 interface Portfolio {
   id: string;
   name: string;
   description: string | null;
-}
-
-interface Asset {
-  id: string;
-  portfolio_id: string;
-  name: string;
-  asset_type: 'office' | 'retail' | 'industrial' | 'residential' | 'mixed_use';
-  address: string;
-  total_area: number;
-  year_built?: number;
-  energy_rating?: string;
 }
 
 interface AssetTenant {
