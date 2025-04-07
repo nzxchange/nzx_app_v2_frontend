@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database as SupabaseDatabase } from './database.types';
+import { Database } from '../types/supabase';  // Update path to your types
 
 // Get environment variables with proper error handling
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -7,21 +7,53 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // Validate environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Please check your .env.local file.');
+  console.error('Missing environment variables:', { 
+    hasUrl: !!supabaseUrl, 
+    hasKey: !!supabaseAnonKey 
+  });
+  throw new Error('Missing Supabase environment variables');
 }
 
-// Create a Supabase client
-export const supabase = createClient<SupabaseDatabase>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true
-    }
+// Create a single Supabase client instance
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
   }
-);
+});
+
+// Debug helper
+export const debugSupabaseConnection = async () => {
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    return {
+      hasSession: !!data.session,
+      error: error?.message,
+      url: supabaseUrl?.substring(0, 10) + '...',
+      keyExists: !!supabaseAnonKey
+    };
+  } catch (e) {
+    const error = e as Error;
+    return {
+      error: error.message,
+      url: supabaseUrl?.substring(0, 10) + '...',
+      keyExists: !!supabaseAnonKey
+    };
+  }
+};
+
+// Test connection in development
+if (process.env.NODE_ENV === 'development') {
+  (async () => {
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      console.log('Supabase Connection Test:', error ? 'Failed' : 'Success', { error });
+    } catch (e) {
+      console.error('Supabase Init Error:', e);
+    }
+  })();
+}
 
 // Add a debug function to check authentication
 export const checkAuth = async () => {
@@ -35,7 +67,7 @@ export const checkAuth = async () => {
 };
 
 // Export the Database type for use in other files
-export type { SupabaseDatabase };
+export type { Database };
 
 // Type helpers for Supabase tables
 export type Database = {

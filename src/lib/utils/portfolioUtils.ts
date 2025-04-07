@@ -1,17 +1,7 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { supabase } from '../supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-// Create a Supabase client instance
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-// Check if environment variables are set
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey);
-
-export const getOrCreateDefaultPortfolio = async (supabase: SupabaseClient, userId: string) => {
+export const getOrCreateDefaultPortfolio = async (userId: string) => {
   try {
     // Get the user's profile
     const { data: profile, error: profileError } = await supabase
@@ -59,7 +49,7 @@ export const getOrCreateDefaultPortfolio = async (supabase: SupabaseClient, user
 
 export async function createNewPortfolio(name: string, description: string, userId: string) {
   try {
-    // Use the existing supabase client instance
+    // Use the shared supabase instance
     const { data: profile } = await supabase
       .from('profiles')
       .select('organization_id')
