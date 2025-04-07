@@ -26,7 +26,8 @@
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.55.0",
     "react-router-dom": "^7.3.0",
-    "recharts": "^2.12.2"
+    "recharts": "^2.12.2",
+    "supabase": "^2.20.5"
   },
   "devDependencies": {
     "@types/node": "^20.11.19",
